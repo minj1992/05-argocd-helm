@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "enterprise-service.fullname" . }}-svc
+  name: {{ include "enterprise-service.fullname" . }}
   namespace: {{ .Values.namespace | default .Release.Namespace }}
   labels:
     {{- include "enterprise-service.labels" . | nindent 4 }}
