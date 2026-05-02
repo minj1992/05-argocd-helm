@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash
 import os
 import pika
 import json
+import time
 
 app = Flask(__name__)
 
@@ -60,6 +61,14 @@ def register():
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()
-        init_admin()
+        max_retries = 10
+        for i in range(max_retries):
+            try:
+                db.create_all()
+                init_admin()
+                print(" [SYSTEM] Database initialized successfully.")
+                break
+            except Exception as e:
+                print(f" [ERROR] DB Connection failed (attempt {i+1}/{max_retries}): {e}")
+                time.sleep(10)
     app.run(host='0.0.0.0', port=5000)

@@ -185,9 +185,11 @@ This means another service in the cluster is already using the port.
 1.  **Resolution**: We have updated the `frontend-service` to use **NodePort 30009** to avoid conflicts.
 2.  **Access URL**: Your new access URL will be `http://<NodeIP>:30009`.
 
-### ❌ Pod in CrashLoopBackOff (DatabaseError: Unknown host / Connection Refused)
+### ❌ Pod in CrashLoopBackOff (DatabaseError: Connection Refused)
 1.  **Check Service Names**: Service names now exactly match the `fullnameOverride` (e.g., `mysql-service`).
-2.  **Wait for DB**: MySQL takes time to initialize. We have added **initContainers** to all dependent microservices. They will now wait for `mysql-service:3306` to be ready before starting. You will see pods in `Init:0/1` status until MySQL is up.
+2.  **Wait for DB**: MySQL takes time to initialize. We have added **initContainers** and **Python Retry Logic** to all microservices. They will now retry the connection up to 10 times with 10-second intervals.
+3.  **Permissions**: We added `securityContext` (UID 999) to MySQL to ensure it has permissions to write to the EBS volumes.
+4.  **Rebuild App**: If you modified the Python code, remember to rebuild and push: `./rebuild_and_deploy.sh v9`.
 
 ---
 

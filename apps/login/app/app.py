@@ -4,6 +4,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import os
 import redis
 import json
+import time
 
 app = Flask(__name__)
 
@@ -54,4 +55,15 @@ def change_password():
     return jsonify({"error": "Invalid current password"}), 400
 
 if __name__ == '__main__':
+    with app.app_context():
+        max_retries = 10
+        for i in range(max_retries):
+            try:
+                # Check DB connection
+                db.engine.connect()
+                print(" [SYSTEM] Database connected successfully.")
+                break
+            except Exception as e:
+                print(f" [ERROR] DB Connection failed (attempt {i+1}/{max_retries}): {e}")
+                time.sleep(10)
     app.run(host='0.0.0.0', port=5000)
