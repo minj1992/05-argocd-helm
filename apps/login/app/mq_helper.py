@@ -2,7 +2,7 @@ import pika
 import json
 import os
 
-RABBITMQ_HOST = os.getenv('RABBITMQ_HOST', 'rabbitmq-svc.enterprise-lab.svc.cluster.local')
+RABBITMQ_HOST = os.getenv('RABBITMQ_HOST', 'rabbitmq-svc')
 
 def publish_event(event_type, data):
     try:

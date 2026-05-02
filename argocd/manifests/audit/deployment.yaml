@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: audit-service
-        image: minjteck/audit-service:v8
+        image: minjteck/audit-service:v9
         ports:
         - containerPort: 8000
         env:
