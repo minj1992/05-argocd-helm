@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/minj1992/03-argocd.git
+    repoURL: https://github.com/minj1992/04-argocd.git
     targetRevision: master
     path: 04-argocd/argocd/manifests/logout
   destination:
