@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: frontend-service
-        image: minjteck/frontend-service:v1
+        image: minjteck/frontend-service:v3
         ports:
         - containerPort: 8080
         volumeMounts:
@@ -30,7 +30,7 @@ spec:
             name: mysql-secret
         livenessProbe:
           httpGet:
-            path: /
+            path: /health
             port: 8080
           initialDelaySeconds: 30
       volumes:

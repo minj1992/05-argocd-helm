@@ -179,6 +179,12 @@ cd ../../..
 2. **ArgoCD Cascading**: The root app creates the child apps, which then create the manifests for each service.
 
 ## 🔹 7. Validation
+### Default Admin Credentials
+Use the following credentials to log into the web application:
+- **Username**: `admin`
+- **Email**: `admin@devops.com`
+- **Password**: `admin`
+
 ### Check Real-time Events
 To see the RabbitMQ communication in action:
 ```bash

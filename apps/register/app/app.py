@@ -17,6 +17,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+mysqlconnector://{MYSQL_USER}:{M
 db = SQLAlchemy(app)
 RABBITMQ_HOST = os.getenv('RABBITMQ_HOST', 'rabbitmq-svc')
 
+@app.route('/health')
+def health():
+    return jsonify({"status": "ok"}), 200
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True)

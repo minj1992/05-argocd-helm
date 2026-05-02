@@ -17,6 +17,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+mysqlconnector://{MYSQL_USER}:{M
 db = SQLAlchemy(app)
 cache = redis.Redis(host=os.getenv('REDIS_HOST', 'redis-svc'), port=6379, decode_responses=True)
 
+@app.route('/health')
+def health():
+    return jsonify({"status": "ok"}), 200
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True)

@@ -7,6 +7,10 @@ app = Flask(__name__)
 # Config
 cache = redis.Redis(host=os.getenv('REDIS_HOST', 'redis-svc'), port=6379, decode_responses=True)
 
+@app.route('/health')
+def health():
+    return jsonify({"status": "ok"}), 200
+
 from mq_helper import publish_event
 
 @app.route('/logout', methods=['POST'])

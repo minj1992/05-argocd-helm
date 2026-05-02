@@ -14,6 +14,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+mysqlconnector://{MYSQL_USER}:{M
 
 db = SQLAlchemy(app)
 
+@app.route('/health')
+def health():
+    return jsonify({"status": "ok"}), 200
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True)

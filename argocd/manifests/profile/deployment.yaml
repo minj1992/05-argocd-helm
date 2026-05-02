@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: profile-service
-        image: minjteck/profile-service:v1
+        image: minjteck/profile-service:v3
         ports:
         - containerPort: 5000
         env:
@@ -29,6 +29,6 @@ spec:
           value: password123
         livenessProbe:
           httpGet:
-            path: /profile/1
+            path: /health
             port: 5000
           initialDelaySeconds: 30

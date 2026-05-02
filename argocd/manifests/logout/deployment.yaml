@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: logout-service
-        image: minjteck/logout-service:v1
+        image: minjteck/logout-service:v3
         ports:
         - containerPort: 5000
         env:
@@ -23,6 +23,6 @@ spec:
           value: redis-svc
         livenessProbe:
           httpGet:
-            path: /logout
+            path: /health
             port: 5000
           initialDelaySeconds: 30
