@@ -1,0 +1,23 @@
+enterprise-service:
+  nameOverride: "audit-service"
+  replicaCount: 1
+  image:
+    repository: minjteck/audit-service
+    tag: "v9"
+  ports:
+    - containerPort: 8000
+  env:
+    - name: RABBITMQ_HOST
+      value: rabbitmq-svc
+    - name: REDIS_HOST
+      value: redis-svc
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 15
+    periodSeconds: 10
+  service:
+    type: ClusterIP
+    port: 8000
+    targetPort: 8000

@@ -1,0 +1,26 @@
+enterprise-service:
+  nameOverride: "profile-service"
+  replicaCount: 1
+  image:
+    repository: minjteck/profile-service
+    tag: "v9"
+  ports:
+    - containerPort: 5000
+  env:
+    - name: MYSQL_HOST
+      value: mysql-svc
+    - name: MYSQL_DB
+      value: enterprise_db
+    - name: MYSQL_USER
+      value: admin
+    - name: MYSQL_PASSWORD
+      value: password123
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 5000
+    initialDelaySeconds: 30
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 5000

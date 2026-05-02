@@ -1,0 +1,20 @@
+enterprise-service:
+  nameOverride: "logout-service"
+  replicaCount: 1
+  image:
+    repository: minjteck/logout-service
+    tag: "v9"
+  ports:
+    - containerPort: 5000
+  env:
+    - name: REDIS_HOST
+      value: redis-svc
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 5000
+    initialDelaySeconds: 30
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 5000

@@ -1,0 +1,60 @@
+enterprise-service:
+  nameOverride: "login-service"
+  replicaCount: 1
+  image:
+    repository: minjteck/login-service
+    tag: "v9"
+  ports:
+    - containerPort: 5000
+  env:
+    - name: SECRET_KEY
+      valueFrom:
+        secretKeyRef:
+          name: login-service-secret
+          key: SECRET_KEY
+    - name: MYSQL_HOST
+      valueFrom:
+        configMapKeyRef:
+          name: login-service-config
+          key: MYSQL_HOST
+    - name: MYSQL_DB
+      valueFrom:
+        configMapKeyRef:
+          name: login-service-config
+          key: MYSQL_DB
+    - name: MYSQL_USER
+      value: admin
+    - name: MYSQL_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: mysql-service-secret
+          key: MYSQL_PASSWORD
+    - name: REDIS_HOST
+      valueFrom:
+        configMapKeyRef:
+          name: login-service-config
+          key: REDIS_HOST
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 5000
+    initialDelaySeconds: 30
+  persistence:
+    enabled: true
+    storageClass: "ebs-sc"
+    size: 1Gi
+    mountPath: /data
+  config:
+    enabled: true
+    data:
+      MYSQL_HOST: "mysql-svc"
+      MYSQL_DB: "enterprise_db"
+      REDIS_HOST: "redis-svc"
+  secret:
+    enabled: true
+    stringData:
+      SECRET_KEY: nishant-devops-class-login-key
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 5000

@@ -1,0 +1,67 @@
+# Default values for enterprise-service.
+nameOverride: ""
+fullnameOverride: ""
+
+replicaCount: 1
+
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+  nodePort: null
+
+env: []
+# - name: DB_HOST
+#   value: "mysql"
+
+envFrom: []
+# - configMapRef:
+#     name: config
+# - secretRef:
+#     name: secret
+
+ports:
+  - containerPort: 8080
+
+livenessProbe: {}
+#  httpGet:
+#    path: /health
+#    port: 8080
+#  initialDelaySeconds: 15
+#  periodSeconds: 10
+
+resources: {}
+
+volumes: []
+volumeMounts: []
+
+persistence:
+  enabled: false
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 1Gi
+  mountPath: /data
+
+config:
+  enabled: false
+  data: {}
+
+secret:
+  enabled: false
+  data: {}
+
+rbac:
+  enabled: false
+  serviceAccountName: ""
+  clusterRole:
+    create: false
+    rules: []
+
+serviceAccount:
+  create: false
+  name: ""

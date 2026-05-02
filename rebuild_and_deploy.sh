@@ -39,20 +39,20 @@ for SVC in "${SERVICES[@]}"; do
     echo "⬆️  Pushing $IMAGE:$TAG..."
     docker push "$IMAGE:$TAG"
     
-    # 4. Update Manifest
-    MANIFEST="argocd/manifests/$SVC/deployment.yaml"
-    if [ -f "$MANIFEST" ]; then
-        echo "📝 Updating manifest: $MANIFEST"
-        # Update the image line with the new tag
-        sed -i "s|image: ${IMAGE}:.*|image: ${IMAGE}:${TAG}|g" "$MANIFEST"
+    # 4. Update Helm Values
+    VALUES_FILE="argocd/manifests/$SVC/values.yaml"
+    if [ -f "$VALUES_FILE" ]; then
+        echo "📝 Updating Helm values: $VALUES_FILE"
+        # Update the tag line in values.yaml
+        sed -i "s|tag: \".*\"|tag: \"${TAG}\"|g" "$VALUES_FILE"
     else
-        echo "⚠️  Warning: Manifest $MANIFEST not found."
+        echo "⚠️  Warning: Values file $VALUES_FILE not found."
     fi
 done
 
 echo ""
 echo "------------------------------------------"
-echo "✅ All services built, pushed, and manifests updated to tag: $TAG"
-echo "# To apply changes manually, run:"
-echo "# kubectl apply -f argocd/manifests/frontend/rbac.yaml"
+echo "✅ All services built, pushed, and Helm values updated to tag: $TAG"
+echo "# ArgoCD will detect the changes in values.yaml and sync automatically."
+echo "# To apply root changes manually, run:"
 echo "# kubectl apply -f root-argocd.yaml"

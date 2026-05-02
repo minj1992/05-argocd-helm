@@ -1,0 +1,9 @@
+apiVersion: v2
+name: forgot-password
+description: Forgot Password service helm chart
+type: application
+version: 0.1.0
+dependencies:
+  - name: enterprise-service
+    version: 0.1.0
+    repository: "file://../../../charts/enterprise-service"

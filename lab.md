@@ -1,105 +1,56 @@
-# Lab 04: Nishant DevOps Class - Enterprise Microservices
+# Lab 05: Enterprise GitOps with Helm & ArgoCD
 
 ## 🔹 1. Git Repository Structure
-This lab follows a strict **App-of-Apps** pattern with deep separation of concerns.
+This lab transitions from static YAML manifests to a **Centralized Helm Chart** pattern. Each microservice now uses a common base chart, providing its own `values.yaml`.
 
 ```text
-04-argocd/
-├── root-argocd.yaml          # Root Application
+05-argocd-helm/
+├── root-argocd.yaml          # Root Application (Helm-enabled)
 │
-├── argocd/                   # ArgoCD Child Manifests (Child Prefix)
+├── charts/                   # Centralized Enterprise Chart
+│   └── enterprise-service/   # Base templates for all services
+│       ├── Chart.yaml
+│       ├── values.yaml       # Default global values
+│       └── templates/        # Reusable Deployment, SVC, Secret templates
+│
+├── argocd/                   # ArgoCD Child Manifests
 │   ├── child-frontend-microservice.yaml
-│   ├── child-login-microservice.yaml
-│   ├── child-audit-microservice.yaml
 │   └── ... 
 │
-├── argocd/manifests/         # Kubernetes Resources (Dedicated Files)
+├── argocd/manifests/         # Service-specific Helm Charts
 │   ├── frontend/
-│   │   ├── deployment.yaml
-│   │   ├── service.yaml
-│   │   ├── rbac.yaml         # Cluster API Access Permissions
-│   │   └── ...
-│   ├── login/
-│   │   ├── deployment.yaml   # Includes PVC & Secret integration
-│   │   ├── service.yaml
-│   │   ├── pvc.yaml
-│   │   ├── storageclass.yaml
-│   │   ├── secret.yaml
-│   │   └── configmap.yaml
+│   │   ├── Chart.yaml        # References ../../../charts/enterprise-service
+│   │   └── values.yaml       # Frontend-specific overrides
 │   └── ...
 │
 └── apps/                     # Application Source Code
-    ├── login/app/
-    │   ├── app.py
-    │   ├── mq_helper.py      # Shared Event Publisher
-    │   └── Dockerfile
     └── ...
 ```
 
-## 🔹 2. Application Workflow & Enterprise Architecture
-This diagram illustrates how the frontend connects to specialized microservices, utilizing **RabbitMQ** for event-driven auditing and **Redis** for real-time dashboard updates.
-
-```text
-+----------+      +------------------+      +-----------------------+
-|   User   | ---> | Frontend WebApp  | ---> | Auth Microservices    |
-+----------+      | (NodePort 30007) |      | (Login, Register, etc)|
-                  +---------+--------+      +-----------+-----------+
-                            |                           |
-                            |           +---------------+---------------+
-                            |           |                               |
-                            v           v                               v
-                  +-----------------------+                 +-----------------------+
-                  |    RabbitMQ (MQ)      |                 |    MySQL Database     |
-                  | (Event-Driven Bus)    |                 | (Relational Storage)  |
-                  +-----------+-----------+                 +-----------------------+
-                            |
-                            v
-                  +-----------------------+                 +-----------------------+
-                  |    Audit Service      | -------->       |     Redis Cache       |
-                  | (Event Consumer)      |                 | (Live Dash Metrics)   |
-                  +-----------+-----------+                 +-----------+-----------+
-                            |                                           |
-                            +-------------------------------------------+
-                                            |
-                                            v
-                                  +-----------------------+
-                                  | Enterprise Dashboard  |
-                                  | (Live Logs & Metrics) |
-                                  +-----------------------+
-```
-
-## 🔹 3. ArgoCD App-of-Apps Workflow
-The root application manages the lifecycle of individual microservice applications, ensuring a clean separation between infrastructure management and application logic.
+## 🔹 2. Centralized Helm Architecture
+By using a centralized chart, we reduce boilerplate code. Instead of managing 10 separate Deployment YAMLs, we manage one template and 10 small `values.yaml` files.
 
 ```text
 +-----------------------+          +-----------------------+
-|    Git Repository     | -------> |    ArgoCD Server      |
-| (Desired State YAML)  |          | (Controller/UI)       |
-+-----------------------+          +-----------+-----------+
-                                               |
-                                               v
-                                   +-----------------------+
-                                   |   Root Application    |
-                                   |  (root-argocd.yaml)   |
-                                   +-----------+-----------+
-                                               |
-         +-------------------------------------+-------------------------------------+
-         |                                     |                                     |
-         v                                     v                                     v
-+-----------------------+           +-----------------------+           +-----------------------+
-|   Child-Frontend      |           |   Child-Auth Apps     |           |   Child-Infra Apps    |
-| (App-specific YAML)   |           | (App-specific YAML)   |           | (App-specific YAML)   |
-+-----------+-----------+           +-----------+-----------+           +-----------+-----------+
-            |                                   |                                   |
-            v                                   v                                   v
-+-----------------------+           +-----------------------+           +-----------------------+
-| Kubernetes Resources  |           | Kubernetes Resources  |           | Kubernetes Resources  |
-| (Deploy, SVC, PVC)    |           | (Deploy, SVC, Secret) |           | (MySQL, Redis, MQ)    |
-+-----------------------+           +-----------------------+           +-----------------------+
+|  Centralized Chart    | <------- |   Microservice App    |
+| (enterprise-service)  |          | (login, audit, etc.)  |
++-----------+-----------+          +-----------+-----------+
+            |                                  |
+            v                                  v
+    [ Shared Templates ]               [ Service Values ]
+    (Deploy, SVC, PVC)                 (Image, Env, Port)
 ```
 
-## 🔹 4. Real-time Event-Driven Architecture (RabbitMQ Flow)
-Each microservice communicates asynchronously via RabbitMQ for real-time auditing and side effects. The **Audit Service** acts as a bridge between the event bus and the **Enterprise Dashboard**.
+## 🔹 3. Helm dependency Management
+Each microservice chart in `argocd/manifests/` defines the centralized chart as a local dependency. ArgoCD automatically runs `helm dependency build` before applying the resources.
+
+**Example `Chart.yaml` for a service:**
+```yaml
+dependencies:
+  - name: enterprise-service
+    version: 0.1.0
+    repository: "file://../../../charts/enterprise-service"
+```
 
 ```text
 [ Microservices ] ---▶ [ RabbitMQ Exchange ] ---▶ [ Audit Worker ]
@@ -114,7 +65,18 @@ Each microservice communicates asynchronously via RabbitMQ for real-time auditin
 - **Database Metrics**: Automatic discovery of active tables and user counts.
 - **Architecture-as-Code**: The Frontend renders `lab.md` directly into the UI for documentation accessibility.
 
-## 🔹 5. Build and Push (Detailed Steps)
+## 🔹 4. Automated Build and Deploy
+The provided automation script `rebuild_and_deploy.sh` has been updated to support the new Helm structure. It builds images, pushes them, and updates the `tag` in `values.yaml` for each service.
+
+### Usage:
+```bash
+# Run the script with a new tag (e.g., v10)
+./rebuild_and_deploy.sh v10
+```
+
+---
+
+## 🔹 5. Manual Build and Push (Detailed Steps)
 
 ### Step 1: Login to Docker
 ```bash
@@ -179,9 +141,42 @@ docker push minjteck/logout-service:v1
 cd ../../..
 ```
 
-## 🔹 6. Deployment Steps
-1. **Initialize Root App**: `kubectl apply -f root-argocd.yaml`
-2. **ArgoCD Cascading**: The root app creates the child apps, which then create the manifests for each service.
+## 🔹 6. Deployment Steps (ArgoCD)
+Deploying the enterprise stack with ArgoCD is a two-step process: initializing the root controller and letting it cascade the child microservices.
+
+### Step 1: Create ArgoCD Namespace
+If you haven't already installed ArgoCD, create the namespace:
+```bash
+kubectl create namespace argocd
+```
+
+### Step 2: Install ArgoCD (Stable)
+```bash
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+```
+
+### Step 3: Deploy Root Application
+The Root application manages all microservices. Applying this file will trigger ArgoCD to create 10 child applications:
+```bash
+kubectl apply -f root-argocd.yaml
+```
+
+### Step 4: Access ArgoCD UI
+To monitor the sync status visually:
+```bash
+# Get initial admin password
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+
+# Port forward to localhost:8080
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+```
+
+### Step 5: Verify Cascading Sync
+ArgoCD will automatically:
+1.  Read the `argocd/` folder.
+2.  Create Application objects for `login`, `frontend`, `audit`, etc.
+3.  Execute `helm dependency build` for each microservice.
+4.  Deploy the resources into the `enterprise-lab` namespace.
 
 ## 🔹 7. Manifest Architecture & Usage
 Each microservice is bundled with specific Kubernetes objects that enable enterprise features:
@@ -208,3 +203,34 @@ To see the RabbitMQ communication in action:
 kubectl logs -f deployment/audit-service -n enterprise-lab
 ```
 Now, go to the Frontend UI, login or register, and you will see the **[AUDIT]** logs appear instantly in your terminal!
+
+---
+
+## 🔹 9. Cleanup
+To remove all resources created by this lab, use the following commands:
+
+### 1. Delete Root Application
+```bash
+# Delete the root application
+kubectl delete -f root-argocd.yaml
+```
+
+### 2. Delete All Child Applications
+If child applications are still running in the ArgoCD UI, delete them manually:
+```bash
+# Delete all applications in the argocd namespace
+kubectl delete apps --all -n argocd
+```
+
+### 3. Force Delete (If apps are stuck)
+If applications are stuck in "Deleting" status, remove their finalizers to force delete:
+```bash
+# Remove finalizers and delete all apps
+kubectl get apps -n argocd -o name | xargs -I {} kubectl patch {} -n argocd --type=merge -p '{"metadata":{"finalizers":null}}' && kubectl delete apps --all -n argocd
+```
+
+### 4. Remove Namespace
+```bash
+# (Optional) Delete the application namespace
+kubectl delete namespace enterprise-lab
+```

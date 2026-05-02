@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/minj1992/04-argocd.git
+    repoURL: https://github.com/minj1992/05-argocd-helm.git
     targetRevision: master
     path: argocd
   destination:

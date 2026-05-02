@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: login-config
-  namespace: enterprise-lab
-data:
-  MYSQL_HOST: mysql-svc
-  MYSQL_DB: enterprise_db
-  REDIS_HOST: redis-svc

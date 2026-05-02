@@ -1,0 +1,14 @@
+enterprise-service:
+  nameOverride: "rabbitmq"
+  replicaCount: 1
+  image:
+    repository: rabbitmq
+    tag: "3-management-alpine"
+  ports:
+    - containerPort: 5672
+    - containerPort: 15672
+      name: mgmt
+  service:
+    type: ClusterIP
+    port: 5672
+    targetPort: 5672

@@ -1,0 +1,3 @@
+{{- if .Values.extraManifests }}
+{{- toYaml .Values.extraManifests -}}
+{{- end }}
