@@ -35,3 +35,8 @@ enterprise-service:
     type: ClusterIP
     port: 3306
     targetPort: 3306
+  readinessProbe:
+    tcpSocket:
+      port: 3306
+    initialDelaySeconds: 30
+    periodSeconds: 10
