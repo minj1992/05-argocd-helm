@@ -1,4 +1,4 @@
-fullnameOverride: "redis"
+fullnameOverride: "redis-svc"
 replicaCount: 1
 image:
   repository: redis

@@ -185,11 +185,22 @@ This means another service in the cluster is already using the port.
 1.  **Resolution**: We have updated the `frontend-service` to use **NodePort 30009** to avoid conflicts.
 2.  **Access URL**: Your new access URL will be `http://<NodeIP>:30009`.
 
-### ❌ Pod in CrashLoopBackOff (DatabaseError: Connection Refused)
-1.  **Check Service Names**: Service names now exactly match the `fullnameOverride` (e.g., `mysql-service`).
-2.  **Wait for DB**: MySQL takes time to initialize. We have added **initContainers** and **Python Retry Logic** to all microservices. They will now retry the connection up to 10 times with 10-second intervals.
-3.  **Permissions**: We added `securityContext` (UID 999) to MySQL to ensure it has permissions to write to the EBS volumes.
-4.  **Rebuild App**: If you modified the Python code, remember to rebuild and push: `./rebuild_and_deploy.sh v9`.
+### ❌ Error: spec.selector: field is immutable
+This occurs when you change the labels or `fullnameOverride` of a microservice that was already deployed.
+1.  **Resolution**: Manually delete the problematic deployment and let ArgoCD recreate it with the correct selectors:
+    ```bash
+    kubectl delete deployment <deployment-name> -n enterprise-lab
+    ```
+2.  **Example**: `kubectl delete deployment mysql-service -n enterprise-lab`
+
+### ❌ Internal Server Error (500) on Dashboard
+This usually occurs because of a mismatch between the infrastructure configuration and what the app expects.
+1.  **Service Names**: Ensure all services use the `-svc` suffix as expected by the app (e.g., `mysql-svc`, `redis-svc`).
+2.  **Dependencies Not Ready**: If you see `waiting for mysql` in logs, it means the `initContainer` is doing its job. Ensure the `mysql-svc` pod is Running and Healthy.
+3.  **Check Logs**:
+    ```bash
+    kubectl logs -f deployment/frontend-service-svc -n enterprise-lab
+    ```
 
 ---
 

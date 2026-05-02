@@ -1,4 +1,4 @@
-fullnameOverride: "mysql-service"
+fullnameOverride: "mysql-svc"
 replicaCount: 1
 podSecurityContext:
   fsGroup: 999
@@ -13,7 +13,7 @@ env:
   - name: MYSQL_ROOT_PASSWORD
     valueFrom:
       secretKeyRef:
-        name: mysql-service-secret
+        name: mysql-svc-secret
         key: MYSQL_ROOT_PASSWORD
   - name: MYSQL_DATABASE
     value: enterprise_db
@@ -22,7 +22,7 @@ env:
   - name: MYSQL_PASSWORD
     valueFrom:
       secretKeyRef:
-        name: mysql-service-secret
+        name: mysql-svc-secret
         key: MYSQL_PASSWORD
 persistence:
   enabled: true

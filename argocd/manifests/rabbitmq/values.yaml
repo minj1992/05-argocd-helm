@@ -1,4 +1,4 @@
-fullnameOverride: "rabbitmq"
+fullnameOverride: "rabbitmq-svc"
 replicaCount: 1
 image:
   repository: rabbitmq

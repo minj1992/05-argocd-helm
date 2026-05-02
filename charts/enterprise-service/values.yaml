@@ -67,3 +67,5 @@ rbac:
 serviceAccount:
   create: false
   name: ""
+
+extraManifests: []

@@ -1,4 +1,4 @@
-fullnameOverride: "profile-service"
+fullnameOverride: "profile-service-svc"
 replicaCount: 1
 image:
   repository: minjteck/profile-service
@@ -7,7 +7,7 @@ ports:
   - containerPort: 5000
 env:
   - name: MYSQL_HOST
-    value: mysql-service
+    value: mysql-svc
   - name: MYSQL_DB
     value: enterprise_db
   - name: MYSQL_USER
@@ -22,7 +22,7 @@ livenessProbe:
 initContainers:
   - name: wait-for-mysql
     image: busybox:1.28
-    command: ['sh', '-c', "until nc -zv mysql-service 3306; do echo waiting for mysql; sleep 5; done; sleep 10;"]
+    command: ['sh', '-c', "until nc -zv mysql-svc 3306; do echo waiting for mysql; sleep 5; done; sleep 10;"]
 service:
   type: ClusterIP
   port: 80

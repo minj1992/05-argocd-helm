@@ -1,4 +1,4 @@
-fullnameOverride: "audit-service"
+fullnameOverride: "audit-service-svc"
 replicaCount: 1
 image:
   repository: minjteck/audit-service
@@ -7,13 +7,13 @@ ports:
   - containerPort: 8000
 env:
   - name: RABBITMQ_HOST
-    value: rabbitmq
+    value: rabbitmq-svc
   - name: REDIS_HOST
-    value: redis
+    value: redis-svc
 initContainers:
   - name: wait-for-rabbitmq
     image: busybox:1.28
-    command: ['sh', '-c', "until nc -zv rabbitmq 5672; do echo waiting for rabbitmq; sleep 5; done; sleep 10;"]
+    command: ['sh', '-c', "until nc -zv rabbitmq-svc 5672; do echo waiting for rabbitmq; sleep 5; done; sleep 10;"]
 livenessProbe:
   httpGet:
     path: /health

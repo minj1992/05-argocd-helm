@@ -1,4 +1,4 @@
-fullnameOverride: "login-service"
+fullnameOverride: "login-service-svc"
 replicaCount: 1
 image:
   repository: minjteck/login-service
@@ -9,29 +9,29 @@ env:
   - name: SECRET_KEY
     valueFrom:
       secretKeyRef:
-        name: login-service-secret
+        name: login-service-svc-secret
         key: SECRET_KEY
   - name: MYSQL_HOST
     valueFrom:
       configMapKeyRef:
-        name: login-service-config
+        name: login-service-svc-config
         key: MYSQL_HOST
   - name: MYSQL_DB
     valueFrom:
       configMapKeyRef:
-        name: login-service-config
+        name: login-service-svc-config
         key: MYSQL_DB
   - name: MYSQL_USER
     value: admin
   - name: MYSQL_PASSWORD
     valueFrom:
       secretKeyRef:
-        name: mysql-service-secret
+        name: mysql-svc-secret
         key: MYSQL_PASSWORD
   - name: REDIS_HOST
     valueFrom:
       configMapKeyRef:
-        name: login-service-config
+        name: login-service-svc-config
         key: REDIS_HOST
 livenessProbe:
   httpGet:
@@ -41,7 +41,7 @@ livenessProbe:
 initContainers:
   - name: wait-for-mysql
     image: busybox:1.28
-    command: ['sh', '-c', "until nc -zv mysql-service 3306; do echo waiting for mysql; sleep 5; done; sleep 10;"]
+    command: ['sh', '-c', "until nc -zv mysql-svc 3306; do echo waiting for mysql; sleep 5; done; sleep 10;"]
 persistence:
   enabled: true
   storageClass: "ebs-sc"
@@ -50,9 +50,9 @@ persistence:
 config:
   enabled: true
   data:
-    MYSQL_HOST: "mysql-service"
+    MYSQL_HOST: "mysql-svc"
     MYSQL_DB: "enterprise_db"
-    REDIS_HOST: "redis"
+    REDIS_HOST: "redis-svc"
 secret:
   enabled: true
   stringData:

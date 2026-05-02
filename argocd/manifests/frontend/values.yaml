@@ -1,4 +1,4 @@
-fullnameOverride: "frontend-service"
+fullnameOverride: "frontend-service-svc"
 replicaCount: 2
 image:
   repository: minjteck/frontend-service
@@ -13,14 +13,14 @@ service:
 initContainers:
   - name: wait-for-mysql
     image: busybox:1.28
-    command: ['sh', '-c', "until nc -zv mysql-service 3306; do echo waiting for mysql; sleep 5; done; sleep 10;"]
+    command: ['sh', '-c', "until nc -zv mysql-svc 3306; do echo waiting for mysql; sleep 5; done; sleep 10;"]
 envFrom:
   - configMapRef:
-      name: frontend-service-config
+      name: frontend-service-svc-config
   - secretRef:
-      name: frontend-service-secret
+      name: frontend-service-svc-secret
   - secretRef:
-      name: mysql-service-secret
+      name: mysql-svc-secret
 livenessProbe:
   httpGet:
     path: /health
@@ -34,11 +34,14 @@ persistence:
 config:
   enabled: true
   data:
-    LOGIN_URL: "http://login-service/login"
-    REGISTER_URL: "http://register-service/register"
-    PROFILE_URL: "http://profile-service/profile"
-    FORGOT_PASSWORD_URL: "http://forgot-password-service/reset-password"
-    LOGOUT_URL: "http://logout-service/logout"
+    LOGIN_URL: "http://login-service-svc/login"
+    REGISTER_URL: "http://register-service-svc/register"
+    PROFILE_URL: "http://profile-service-svc/profile"
+    FORGOT_PASSWORD_URL: "http://forgot-password-service-svc/reset-password"
+    LOGOUT_URL: "http://logout-service-svc/logout"
+    REDIS_HOST: "redis-svc"
+    MYSQL_HOST: "mysql-svc"
+    RABBITMQ_MGMT_URL: "http://rabbitmq-svc:15672/api/queues"
 secret:
   enabled: true
   stringData:
