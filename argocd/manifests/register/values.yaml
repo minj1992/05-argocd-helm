@@ -1,5 +1,4 @@
 fullnameOverride: "register-service"
-replicaCount: 1
 image:
   repository: minjteck/register-service
   tag: "v9"
@@ -16,15 +15,6 @@ env:
     value: password123
   - name: RABBITMQ_HOST
     value: rabbitmq
-livenessProbe:
-  httpGet:
-    path: /health
-    port: 5000
-  initialDelaySeconds: 30
-initContainers:
-  - name: wait-for-mysql
-    image: busybox:1.28
-    command: ['sh', '-c', "until nc -zv mysql-service 3306; do echo waiting for mysql; sleep 5; done; sleep 10;"]
 service:
   type: ClusterIP
   port: 80

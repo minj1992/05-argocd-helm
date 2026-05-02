@@ -1,5 +1,4 @@
 fullnameOverride: "forgot-password-service"
-replicaCount: 1
 image:
   repository: minjteck/forgot-password-service
   tag: "v9"
@@ -14,15 +13,6 @@ env:
     value: admin
   - name: MYSQL_PASSWORD
     value: password123
-livenessProbe:
-  httpGet:
-    path: /health
-    port: 5000
-  initialDelaySeconds: 30
-initContainers:
-  - name: wait-for-mysql
-    image: busybox:1.28
-    command: ['sh', '-c', "until nc -zv mysql-service 3306; do echo waiting for mysql; sleep 5; done; sleep 10;"]
 service:
   type: ClusterIP
   port: 80
