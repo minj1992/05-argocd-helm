@@ -249,6 +249,18 @@ kubectl delete apps --all -n argocd
 ```
 
 ### 3. Force Delete (If apps are stuck)
+# Delete the root application
+kubectl delete -f root-argocd.yaml
+```
+
+### 2. Delete All Child Applications
+If child applications are still running in the ArgoCD UI, delete them manually:
+```bash
+# Delete all applications in the argocd namespace
+kubectl delete apps --all -n argocd
+```
+
+### 3. Force Delete (If apps are stuck)
 If applications are stuck in "Deleting" status, remove their finalizers to force delete:
 ```bash
 # Remove finalizers and delete all apps
