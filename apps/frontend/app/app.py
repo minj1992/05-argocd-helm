@@ -157,29 +157,43 @@ def set_role(user_id, role):
 @login_required
 @admin_required
 def download_kubeconfig():
-    # This generates a generic kubeconfig for the current cluster
-    # In a real lab, you'd use the actual cluster API server address
-    api_server = f"https://{request.host.split(':')[0]}:6443"
+    # Read actual CA and Token from the pod's service account
+    try:
+        with open('/var/run/secrets/kubernetes.io/serviceaccount/ca.crt', 'rb') as f:
+            ca_data = base64.b64encode(f.read()).decode()
+        with open('/var/run/secrets/kubernetes.io/serviceaccount/token', 'r') as f:
+            token = f.read()
+    except Exception as e:
+        return f"Error reading cluster secrets: {str(e)}", 500
+
+    # Use public IP if accessed externally, otherwise fallback to internal service
+    public_ip = request.host.split(':')[0]
+    api_server = f"https://{public_ip}:6443"
+    
+    # We also provide the internal one as a comment in the kubeconfig
+    internal_server = f"https://{os.getenv('KUBERNETES_SERVICE_HOST', 'kubernetes.default.svc')}:443"
+    
     kubeconfig = f"""
+# Internal Server: {internal_server}
 apiVersion: v1
 clusters:
 - cluster:
+    certificate-authority-data: {ca_data}
     server: {api_server}
-    skip-tls-verify: true
   name: enterprise-cluster
 contexts:
 - context:
     cluster: enterprise-cluster
-    user: admin-user
+    user: frontend-sa
     namespace: enterprise-lab
   name: default
 current-context: default
 kind: Config
 preferences: {{}}
 users:
-- name: admin-user
+- name: frontend-sa
   user:
-    token: admin-token-placeholder
+    token: {token}
 """
     return Response(
         kubeconfig,

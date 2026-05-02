@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: register-service
-        image: minjteck/register-service:v6
+        image: minjteck/register-service:v8
         ports:
         - containerPort: 5000
         env:

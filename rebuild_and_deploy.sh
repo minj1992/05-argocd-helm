@@ -27,6 +27,7 @@ for SVC in "${SERVICES[@]}"; do
     
     # 2. Build new image
     echo "🏗️  Building $IMAGE:$TAG..."
+    cp mq_helper.py "apps/$SVC/app/mq_helper.py"
     docker build -t "$IMAGE:$TAG" "apps/$SVC/app"
     
     if [ $? -ne 0 ]; then

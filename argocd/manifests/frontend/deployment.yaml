@@ -16,7 +16,7 @@ spec:
       serviceAccountName: frontend-sa
       containers:
       - name: frontend-service
-        image: minjteck/frontend-service:v6
+        image: minjteck/frontend-service:v8
         ports:
         - containerPort: 8080
         volumeMounts:
