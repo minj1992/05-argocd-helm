@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: logout-service
-        image: minjteck/logout-service:v4
+        image: minjteck/logout-service:v5
         ports:
         - containerPort: 5000
         env:

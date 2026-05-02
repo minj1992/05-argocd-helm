@@ -26,9 +26,12 @@
                     <td><span class="text-muted">{{ user.permissions }}</span></td>
                     <td>
                         <div class="btn-group">
-                            <button class="btn btn-sm btn-outline-success">Set Admin</button>
-                            <button class="btn btn-sm btn-outline-warning">View Only</button>
-                            <button class="btn btn-sm btn-outline-danger">Revoke</button>
+                            {% if user.role != 'admin' %}
+                            <a href="/admin/set-role/{{ user.id }}/admin" class="btn btn-sm btn-outline-success">Make Admin</a>
+                            {% else %}
+                            <a href="/admin/set-role/{{ user.id }}/user" class="btn btn-sm btn-outline-warning">Downgrade</a>
+                            {% endif %}
+                            <button class="btn btn-sm btn-outline-danger">Deactivate</button>
                         </div>
                     </td>
                 </tr>

@@ -23,7 +23,9 @@ LOGIN_URL = os.getenv('LOGIN_URL', 'http://login-service-svc/login')
 REGISTER_URL = os.getenv('REGISTER_URL', 'http://register-service-svc/register')
 PROFILE_URL = os.getenv('PROFILE_URL', 'http://profile-service-svc/profile')
 ADMIN_USERS_URL = os.getenv('ADMIN_USERS_URL', 'http://profile-service-svc/admin/users')
+UPDATE_ROLE_URL = os.getenv('UPDATE_ROLE_URL', 'http://profile-service-svc/admin/update-role')
 FORGOT_PASSWORD_URL = os.getenv('FORGOT_PASSWORD_URL', 'http://forgot-password-service-svc/reset-password')
+CHANGE_PASSWORD_URL = os.getenv('CHANGE_PASSWORD_URL', 'http://login-service-svc/change-password')
 LOGOUT_URL = os.getenv('LOGOUT_URL', 'http://logout-service-svc/logout')
 
 def login_required(f):
@@ -102,6 +104,45 @@ def reset_password():
         except:
             flash('Forgot Password Service Offline')
     return render_template('reset_password.html')
+
+@app.route('/change-password', methods=['POST'])
+@login_required
+def change_password():
+    old_password = request.form.get('old_password')
+    new_password = request.form.get('new_password')
+    user_id = session.get('user_id')
+    try:
+        resp = requests.post(CHANGE_PASSWORD_URL, json={
+            "user_id": user_id, 
+            "old_password": old_password, 
+            "new_password": new_password
+        }, timeout=5)
+        if resp.status_code == 200:
+            flash('Password updated successfully!')
+        else:
+            flash(resp.json().get('error', 'Update failed'))
+    except:
+        flash('Login Service Offline')
+    return redirect(url_for('profile'))
+
+@app.route('/admin/set-role/<int:user_id>/<role>')
+@login_required
+@admin_required
+def set_role(user_id, role):
+    permissions = "Admin" if role == 'admin' else "View"
+    try:
+        resp = requests.post(UPDATE_ROLE_URL, json={
+            "user_id": user_id, 
+            "role": role, 
+            "permissions": permissions
+        }, timeout=5)
+        if resp.status_code == 200:
+            flash(f'User role updated to {role}')
+        else:
+            flash('Failed to update role')
+    except:
+        flash('Profile Service Offline')
+    return redirect(url_for('manage_users'))
 
 @app.route('/dashboard')
 @login_required

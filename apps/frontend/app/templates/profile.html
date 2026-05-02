@@ -3,17 +3,22 @@
 <div class="row justify-content-center">
     <div class="col-md-7">
         <div class="enterprise-card p-5">
+            <div class="d-flex justify-content-between align-items-center mb-5">
+                <h2 class="fw-bold mb-0">My Identity</h2>
+                <a href="/dashboard" class="btn btn-outline-primary">Back Home</a>
+            </div>
+
             <div class="d-flex align-items-center mb-5">
                 <div class="flex-shrink-0">
                     <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=1a237e&color=fff&size=100" class="rounded-circle shadow-sm" alt="Student Avatar">
                 </div>
                 <div class="flex-grow-1 ms-4">
                     <h2 class="mb-0">{{ user.username }}</h2>
-                    <p class="text-muted mb-0">Nishant DevOps Class Student</p>
+                    <p class="text-muted mb-0">Role: <span class="badge bg-info">{{ user.role|upper }}</span></p>
                 </div>
             </div>
             
-            <div class="row g-4">
+            <div class="row g-4 mb-5">
                 <div class="col-md-6">
                     <div class="p-3 border rounded-3">
                         <small class="text-muted d-block">Corporate Identity</small>
@@ -27,6 +32,19 @@
                     </div>
                 </div>
             </div>
+
+            <h4 class="mb-4">Security Settings</h4>
+            <form action="/change-password" method="POST" class="p-4 border rounded-3 bg-light">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Current Password</label>
+                    <input type="password" name="old_password" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">New Password</label>
+                    <input type="password" name="new_password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-warning w-100 fw-bold">Update Account Password</button>
+            </form>
 
             <div class="mt-5 text-center">
                 <a href="/logout" class="btn btn-outline-danger">Secure Sign Out</a>

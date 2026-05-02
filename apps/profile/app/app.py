@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 import os
 
@@ -46,6 +46,17 @@ def list_users():
         "role": u.role, 
         "permissions": u.permissions
     } for u in users])
+
+@app.route('/admin/update-role', methods=['POST'])
+def update_role():
+    data = request.json
+    user = User.query.get(data['user_id'])
+    if user:
+        user.role = data['role']
+        user.permissions = data['permissions']
+        db.session.commit()
+        return jsonify({"message": f"User {user.username} updated to {user.role}"})
+    return jsonify({"error": "User not found"}), 404
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

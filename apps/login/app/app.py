@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 import os
 import redis
 import json
@@ -41,6 +41,17 @@ def login():
         publish_event("login", {"user_id": user.id, "email": user.email})
         return jsonify({"message": "Login successful", "user_id": user.id, "role": user.role, "permissions": user.permissions})
     return jsonify({"error": "Invalid credentials"}), 401
+
+@app.route('/change-password', methods=['POST'])
+def change_password():
+    data = request.json
+    user = User.query.get(data['user_id'])
+    if user and check_password_hash(user.password, data['old_password']):
+        user.password = generate_password_hash(data['new_password'], method='scrypt')
+        db.session.commit()
+        publish_event("password_change", {"user_id": user.id})
+        return jsonify({"message": "Password changed successfully"})
+    return jsonify({"error": "Invalid current password"}), 400
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
