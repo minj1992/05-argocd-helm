@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash
 import os
 import redis
+import json
 
 app = Flask(__name__)
 
@@ -38,5 +39,4 @@ def login():
     return jsonify({"error": "Invalid credentials"}), 401
 
 if __name__ == '__main__':
-    import json
     app.run(host='0.0.0.0', port=5000)
