@@ -14,6 +14,11 @@ This lab follows a strict **App-of-Apps** pattern with deep separation of concer
 │   └── ... 
 │
 ├── argocd/manifests/         # Kubernetes Resources (Dedicated Files)
+│   ├── frontend/
+│   │   ├── deployment.yaml
+│   │   ├── service.yaml
+│   │   ├── rbac.yaml         # Cluster API Access Permissions
+│   │   └── ...
 │   ├── login/
 │   │   ├── deployment.yaml   # Includes PVC & Secret integration
 │   │   ├── service.yaml
@@ -178,7 +183,19 @@ cd ../../..
 1. **Initialize Root App**: `kubectl apply -f root-argocd.yaml`
 2. **ArgoCD Cascading**: The root app creates the child apps, which then create the manifests for each service.
 
-## 🔹 7. Validation
+## 🔹 7. Manifest Architecture & Usage
+Each microservice is bundled with specific Kubernetes objects that enable enterprise features:
+
+| Manifest | Purpose | Application Usage |
+|----------|---------|-------------------|
+| **Deployment** | Pod Management | Defines the Python container, environment variables (`MYSQL_HOST`), and **Liveness Probes** (`/health`). |
+| **Service** | Load Balancing | Provides internal DNS names like `login-service-svc` which the Frontend uses for API calls. |
+| **Secret** | Security | Holds sensitive DB passwords and Flask `SECRET_KEY`, injected as environment variables. |
+| **ConfigMap** | Configuration | Stores non-sensitive data like DB names or RabbitMQ URLs. |
+| **PVC / SC** | Persistence | Ensures MySQL and Redis data survives pod restarts. Used for the `/data` mount point. |
+| **RBAC** | Permissions | (Frontend Only) Allows the Python code to query `kubectl` style data from within the pod. |
+
+## 🔹 8. Validation
 ### Default Admin Credentials
 Use the following credentials to log into the web application:
 - **Username**: `admin`

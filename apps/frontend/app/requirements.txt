@@ -3,3 +3,4 @@ requests==2.31.0
 redis==5.0.1
 mysql-connector-python==8.2.0
 markdown==3.5.1
+kubernetes==28.1.0

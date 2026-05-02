@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: forgot-password-service
-        image: minjteck/forgot-password-service:v5
+        image: minjteck/forgot-password-service:v6
         ports:
         - containerPort: 5000
         env:

@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: login-service
-        image: minjteck/login-service:v5
+        image: minjteck/login-service:v6
         ports:
         - containerPort: 5000
         volumeMounts:

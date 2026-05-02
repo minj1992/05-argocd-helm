@@ -13,9 +13,10 @@ spec:
       labels:
         app: frontend-service
     spec:
+      serviceAccountName: frontend-sa
       containers:
       - name: frontend-service
-        image: minjteck/frontend-service:v5
+        image: minjteck/frontend-service:v6
         ports:
         - containerPort: 8080
         volumeMounts:

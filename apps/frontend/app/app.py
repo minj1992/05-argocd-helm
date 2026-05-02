@@ -6,6 +6,8 @@ import mysql.connector
 import json
 import markdown
 from functools import wraps
+from kubernetes import client, config
+import base64
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'enterprise-frontend-secret')
@@ -27,6 +29,13 @@ UPDATE_ROLE_URL = os.getenv('UPDATE_ROLE_URL', 'http://profile-service-svc/admin
 FORGOT_PASSWORD_URL = os.getenv('FORGOT_PASSWORD_URL', 'http://forgot-password-service-svc/reset-password')
 CHANGE_PASSWORD_URL = os.getenv('CHANGE_PASSWORD_URL', 'http://login-service-svc/change-password')
 LOGOUT_URL = os.getenv('LOGOUT_URL', 'http://logout-service-svc/logout')
+
+# K8s Client Init
+try:
+    config.load_incluster_config()
+    k8s_v1 = client.CoreV1Api()
+except:
+    k8s_v1 = None
 
 def login_required(f):
     @wraps(f)
@@ -144,6 +153,60 @@ def set_role(user_id, role):
         flash('Profile Service Offline')
     return redirect(url_for('manage_users'))
 
+@app.route('/admin/download-kubeconfig')
+@login_required
+@admin_required
+def download_kubeconfig():
+    # This generates a generic kubeconfig for the current cluster
+    # In a real lab, you'd use the actual cluster API server address
+    api_server = f"https://{request.host.split(':')[0]}:6443"
+    kubeconfig = f"""
+apiVersion: v1
+clusters:
+- cluster:
+    server: {api_server}
+    skip-tls-verify: true
+  name: enterprise-cluster
+contexts:
+- context:
+    cluster: enterprise-cluster
+    user: admin-user
+    namespace: enterprise-lab
+  name: default
+current-context: default
+kind: Config
+preferences: {{}}
+users:
+- name: admin-user
+  user:
+    token: admin-token-placeholder
+"""
+    return Response(
+        kubeconfig,
+        mimetype="text/yaml",
+        headers={"Content-disposition": "attachment; filename=kubeconfig.yaml"}
+    )
+
+@app.route('/api/cluster-info')
+@login_required
+def cluster_info():
+    if not k8s_v1:
+        return jsonify({"error": "K8s API not available"}), 500
+    
+    try:
+        pods = k8s_v1.list_namespaced_pod("enterprise-lab")
+        nodes = k8s_v1.list_node()
+        namespaces = k8s_v1.list_namespace()
+        
+        return jsonify({
+            "pods_count": len(pods.items),
+            "nodes_count": len(nodes.items),
+            "namespaces": [ns.metadata.name for ns in namespaces.items],
+            "pods": [{"name": p.metadata.name, "status": p.status.phase} for p in pods.items]
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
@@ -188,9 +251,27 @@ def stream_logs(service):
 @login_required
 def download_logs():
     r = get_redis_client()
+    # Get all logs from Redis list
     logs = r.lrange("enterprise_audit_log", 0, -1)
-    content = "\n".join(logs)
-    return Response(content, mimetype="text/plain", headers={"Content-disposition": "attachment; filename=enterprise_logs.txt"})
+    
+    # Format logs for better readability in the text file
+    formatted_logs = []
+    for log_str in logs:
+        try:
+            log = json.loads(log_str)
+            formatted_logs.append(f"[{log.get('timestamp')}] {log.get('routing_key')}: {json.dumps(log.get('payload'))}")
+        except:
+            formatted_logs.append(log_str)
+
+    content = "\n".join(formatted_logs)
+    if not content:
+        content = "No logs found in system."
+        
+    return Response(
+        content, 
+        mimetype="text/plain", 
+        headers={"Content-disposition": "attachment; filename=enterprise_audit_logs.txt"}
+    )
 
 @app.route('/architecture')
 @login_required
