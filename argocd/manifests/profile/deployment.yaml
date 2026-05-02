@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: profile-service
-        image: minjteck/profile-service:v3
+        image: minjteck/profile-service:v4
         ports:
         - containerPort: 5000
         env:

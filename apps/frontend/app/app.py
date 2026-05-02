@@ -72,6 +72,37 @@ def login():
             flash('Login Service Offline')
     return render_template('login.html')
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        try:
+            resp = requests.post(REGISTER_URL, json={"username": username, "email": email, "password": password}, timeout=5)
+            if resp.status_code == 201:
+                flash('Registration successful! Please login.')
+                return redirect(url_for('login'))
+            flash('Registration failed.')
+        except:
+            flash('Register Service Offline')
+    return render_template('register.html')
+
+@app.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        new_password = request.form.get('new_password')
+        try:
+            resp = requests.post(FORGOT_PASSWORD_URL, json={"email": email, "new_password": new_password}, timeout=5)
+            if resp.status_code == 200:
+                flash('Password reset successful! Please login.')
+                return redirect(url_for('login'))
+            flash('User not found.')
+        except:
+            flash('Forgot Password Service Offline')
+    return render_template('reset_password.html')
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
