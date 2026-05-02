@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: login-service
+  namespace: enterprise-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: login-service
+  template:
+    metadata:
+      labels:
+        app: login-service
+    spec:
+      containers:
+      - name: login-service
+        image: minjteck/login-service:v1
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - name: login-data
+          mountPath: /data
+        env:
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: login-secret
+              key: SECRET_KEY
+        - name: MYSQL_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: login-config
+              key: MYSQL_HOST
+        - name: MYSQL_DB
+          valueFrom:
+            configMapKeyRef:
+              name: login-config
+              key: MYSQL_DB
+        - name: MYSQL_USER
+          value: admin
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: MYSQL_PASSWORD
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: login-config
+              key: REDIS_HOST
+        livenessProbe:
+          httpGet:
+            path: /login
+            port: 5000
+          initialDelaySeconds: 30
+      volumes:
+      - name: login-data
+        persistentVolumeClaim:
+          claimName: login-pvc

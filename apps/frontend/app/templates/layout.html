@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nishant DevOps Class | Enterprise Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { --primary-color: #1a237e; --secondary-color: #0d47a1; }
+        body { background-color: #f5f6fa; font-family: 'Inter', sans-serif; }
+        .navbar { background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .navbar-brand { font-weight: 800; letter-spacing: 1px; }
+        .enterprise-card { border: none; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); background: white; transition: transform 0.3s; }
+        .enterprise-card:hover { transform: translateY(-5px); }
+        .btn-enterprise { background-color: var(--primary-color); color: white; border-radius: 8px; padding: 10px 25px; border: none; }
+        .btn-enterprise:hover { background-color: var(--secondary-color); color: white; }
+        .footer { background: #2c3e50; color: white; padding: 20px 0; margin-top: 50px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark mb-5">
+        <div class="container">
+            <a class="navbar-brand" href="/">Nishant DevOps Class</a>
+            <div class="navbar-nav ms-auto">
+                {% if session.get('user_id') %}
+                    <a class="nav-link px-3" href="/profile">Dashboard</a>
+                    <a class="nav-link px-3" href="/logout">Sign Out</a>
+                {% else %}
+                    <a class="nav-link px-3" href="/login">Login</a>
+                    <a class="nav-link px-3" href="/register">Join Now</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="footer text-center">
+        <div class="container">
+            <p>&copy; 2026 Nishant DevOps Class | Enterprise Grade Cloud Training</p>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

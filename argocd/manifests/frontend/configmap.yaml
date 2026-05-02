@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  namespace: enterprise-lab
+data:
+  LOGIN_URL: "http://login-service-svc/login"
+  REGISTER_URL: "http://register-service-svc/register"
+  PROFILE_URL: "http://profile-service-svc/profile"
+  FORGOT_PASSWORD_URL: "http://forgot-password-service-svc/reset-password"
+  LOGOUT_URL: "http://logout-service-svc/logout"

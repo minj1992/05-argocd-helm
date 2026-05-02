@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="enterprise-card p-5">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h2 class="fw-bold">Enterprise RBAC Management</h2>
+        <a href="/dashboard" class="btn btn-outline-primary">Back to Console</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Current Role</th>
+                    <th>Permissions</th>
+                    <th>Control Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td class="fw-bold">{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td><span class="badge {{ 'bg-danger' if user.role == 'admin' else 'bg-primary' }}">{{ user.role|upper }}</span></td>
+                    <td><span class="text-muted">{{ user.permissions }}</span></td>
+                    <td>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-success">Set Admin</button>
+                            <button class="btn btn-sm btn-outline-warning">View Only</button>
+                            <button class="btn btn-sm btn-outline-danger">Revoke</button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

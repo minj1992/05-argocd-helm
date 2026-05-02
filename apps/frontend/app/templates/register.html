@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="enterprise-card p-5">
+            <h2 class="text-center mb-4">Join the Class</h2>
+            <form method="POST">
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Full Name</label>
+                    <input type="text" name="username" class="form-control" placeholder="Nishant Minj" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Email Address</label>
+                    <input type="email" name="email" class="form-control" placeholder="nishant@devops.com" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Create Password</label>
+                    <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-enterprise w-100 py-2">Create Account</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

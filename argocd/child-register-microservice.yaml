@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: register-microservice
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/minj1992/03-argocd.git
+    targetRevision: master
+    path: 04-argocd/argocd/manifests/register
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: enterprise-lab
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

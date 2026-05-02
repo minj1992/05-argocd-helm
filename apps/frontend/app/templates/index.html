@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row align-items-center mt-5">
+    <div class="col-lg-6">
+        <h1 class="display-3 fw-bold color-primary mb-4">Enterprise <span class="text-primary">GitOps</span> Lab</h1>
+        <p class="lead mb-5 text-muted">Mastering Microservices Architecture, ArgoCD App-of-Apps, and Cloud Native Persistence with MySQL, Redis, and RabbitMQ.</p>
+        <div class="d-flex gap-3">
+            <a href="/register" class="btn btn-enterprise btn-lg">Get Started</a>
+            <a href="/login" class="btn btn-outline-primary btn-lg">Student Login</a>
+        </div>
+    </div>
+    <div class="col-lg-6 mt-5 mt-lg-0">
+        <div class="enterprise-card p-5 text-center">
+            <h2 class="mb-4">Lab Overview</h2>
+            <ul class="list-unstyled text-start mx-auto d-inline-block">
+                <li>✅ Decoupled Microservices</li>
+                <li>✅ ArgoCD App-of-Apps Logic</li>
+                <li>✅ Persistent EBS Storage</li>
+                <li>✅ Redis Session Caching</li>
+                <li>✅ RabbitMQ Event Streams</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

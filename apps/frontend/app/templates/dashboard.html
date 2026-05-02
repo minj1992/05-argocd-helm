@@ -1,0 +1,86 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold text-primary">Enterprise Command Center</h2>
+    <div class="btn-group">
+        <a href="/download-logs" class="btn btn-outline-dark btn-sm">Download All Logs</a>
+        {% if session.get('role') == 'admin' %}
+            <a href="/admin/users" class="btn btn-danger btn-sm">User Management</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="enterprise-card p-3 text-center bg-primary text-white">
+            <h6 class="small text-uppercase">Role</h6>
+            <h4 class="mb-0">{{ session.get('role')|upper }}</h4>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="enterprise-card p-3 text-center bg-info text-white">
+            <h6 class="small text-uppercase">RabbitMQ Activity</h6>
+            <h4 class="mb-0">{{ mq_stats.messages_total }} MSG</h4>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="enterprise-card p-3 text-center bg-warning text-dark">
+            <h6 class="small text-uppercase">Redis Memory</h6>
+            <h4 class="mb-0">{{ cache_info.used_memory_human }}</h4>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="enterprise-card p-3 text-center bg-success text-white">
+            <h6 class="small text-uppercase">Status</h6>
+            <h4 class="mb-0">PROTECTED</h4>
+        </div>
+    </div>
+</div>
+
+<div class="enterprise-card p-4">
+    <ul class="nav nav-tabs mb-4" id="logTabs" role="tablist">
+        <li class="nav-link active" data-bs-toggle="tab" data-bs-target="#all-logs" style="cursor:pointer">All Activity</li>
+        <li class="nav-link" data-bs-toggle="tab" data-bs-target="#login-logs" style="cursor:pointer" onclick="startStream('login')">Login</li>
+        <li class="nav-link" data-bs-toggle="tab" data-bs-target="#register-logs" style="cursor:pointer" onclick="startStream('register')">Registration</li>
+        <li class="nav-link" data-bs-toggle="tab" data-bs-target="#system-logs" style="cursor:pointer" onclick="startStream('system')">System</li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="all-logs">
+            <div class="bg-dark text-success p-3 rounded-3 font-monospace" style="height: 400px; overflow-y: auto;" id="log-terminal">
+                {% for log in audit_logs %}
+                    <div><span class="text-muted">[{{ log.timestamp }}]</span> <span class="text-info">{{ log.routing_key }}</span>: {{ log.payload }}</div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="tab-pane fade" id="login-logs">
+             <div class="bg-dark text-info p-3 rounded-3 font-monospace" style="height: 400px; overflow-y: auto;" id="stream-terminal-login">
+                Waiting for live events...
+             </div>
+        </div>
+        <div class="tab-pane fade" id="register-logs">
+             <div class="bg-dark text-warning p-3 rounded-3 font-monospace" style="height: 400px; overflow-y: auto;" id="stream-terminal-register">
+                Waiting for registration events...
+             </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentSource = null;
+    function startStream(service) {
+        if (currentSource) currentSource.close();
+        const terminal = document.getElementById('stream-terminal-' + service);
+        if(!terminal) return;
+        
+        currentSource = new EventSource('/stream-logs/' + service);
+        currentSource.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            const line = document.createElement('div');
+            line.innerHTML = `<span class="text-muted">[${data.timestamp}]</span> <span class="text-success">${data.routing_key}</span>: ${JSON.stringify(data.payload)}`;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        };
+    }
+</script>
+{% endblock %}

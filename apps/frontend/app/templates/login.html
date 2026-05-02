@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="enterprise-card p-5">
+            <h2 class="text-center mb-4">Account Login</h2>
+            <form method="POST">
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Corporate Email</label>
+                    <input type="email" name="email" class="form-control" placeholder="name@company.com" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Password</label>
+                    <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-enterprise w-100 py-2 mb-3">Sign In</button>
+                <div class="text-center">
+                    <a href="/reset-password" class="text-decoration-none text-muted">Forgot your password?</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

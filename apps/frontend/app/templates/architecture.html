@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="enterprise-card p-5">
+            <nav aria-label="breadcrumb" class="mb-4">
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                <li class="breadcrumb-item active">Architecture Guide</li>
+              </ol>
+            </nav>
+            <hr>
+            <div class="markdown-body mt-4">
+                {{ content | safe }}
+            </div>
+            <div class="mt-5">
+                <a href="/dashboard" class="btn btn-enterprise">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .markdown-body pre { background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #dee2e6; }
+    .markdown-body h2 { color: #1a237e; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 30px; }
+    .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+    .markdown-body table th, .markdown-body table td { border: 1px solid #dee2e6; padding: 0.75rem; vertical-align: top; }
+</style>
+{% endblock %}

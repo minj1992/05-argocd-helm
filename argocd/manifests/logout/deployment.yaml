@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logout-service
+  namespace: enterprise-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logout-service
+  template:
+    metadata:
+      labels:
+        app: logout-service
+    spec:
+      containers:
+      - name: logout-service
+        image: minjteck/logout-service:v1
+        ports:
+        - containerPort: 5000
+        env:
+        - name: REDIS_HOST
+          value: redis-svc
+        livenessProbe:
+          httpGet:
+            path: /logout
+            port: 5000
+          initialDelaySeconds: 30
