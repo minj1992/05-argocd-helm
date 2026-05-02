@@ -1,42 +1,41 @@
-enterprise-service:
-  fullnameOverride: "mysql-service"
-  replicaCount: 1
-  image:
-    repository: mysql
-    tag: "8.0"
-  ports:
-    - containerPort: 3306
-  env:
-    - name: MYSQL_ROOT_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: mysql-service-secret
-          key: MYSQL_ROOT_PASSWORD
-    - name: MYSQL_DATABASE
-      value: enterprise_db
-    - name: MYSQL_USER
-      value: admin
-    - name: MYSQL_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: mysql-service-secret
-          key: MYSQL_PASSWORD
-  persistence:
-    enabled: true
-    storageClass: "ebs-sc"
-    size: 2Gi
-    mountPath: /var/lib/mysql
-  secret:
-    enabled: true
-    stringData:
-      MYSQL_ROOT_PASSWORD: password123
-      MYSQL_PASSWORD: password123
-  service:
-    type: ClusterIP
+fullnameOverride: "mysql-service"
+replicaCount: 1
+image:
+  repository: mysql
+  tag: "8.0"
+ports:
+  - containerPort: 3306
+env:
+  - name: MYSQL_ROOT_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: mysql-service-secret
+        key: MYSQL_ROOT_PASSWORD
+  - name: MYSQL_DATABASE
+    value: enterprise_db
+  - name: MYSQL_USER
+    value: admin
+  - name: MYSQL_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: mysql-service-secret
+        key: MYSQL_PASSWORD
+persistence:
+  enabled: true
+  storageClass: "ebs-sc"
+  size: 2Gi
+  mountPath: /var/lib/mysql
+secret:
+  enabled: true
+  stringData:
+    MYSQL_ROOT_PASSWORD: password123
+    MYSQL_PASSWORD: password123
+service:
+  type: ClusterIP
+  port: 3306
+  targetPort: 3306
+readinessProbe:
+  tcpSocket:
     port: 3306
-    targetPort: 3306
-  readinessProbe:
-    tcpSocket:
-      port: 3306
-    initialDelaySeconds: 30
-    periodSeconds: 10
+  initialDelaySeconds: 30
+  periodSeconds: 10

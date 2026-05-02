@@ -1,64 +1,63 @@
-enterprise-service:
-  fullnameOverride: "login-service"
-  replicaCount: 1
-  image:
-    repository: minjteck/login-service
-    tag: "v9"
-  ports:
-    - containerPort: 5000
-  env:
-    - name: SECRET_KEY
-      valueFrom:
-        secretKeyRef:
-          name: login-service-secret
-          key: SECRET_KEY
-    - name: MYSQL_HOST
-      valueFrom:
-        configMapKeyRef:
-          name: login-service-config
-          key: MYSQL_HOST
-    - name: MYSQL_DB
-      valueFrom:
-        configMapKeyRef:
-          name: login-service-config
-          key: MYSQL_DB
-    - name: MYSQL_USER
-      value: admin
-    - name: MYSQL_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: mysql-service-secret
-          key: MYSQL_PASSWORD
-    - name: REDIS_HOST
-      valueFrom:
-        configMapKeyRef:
-          name: login-service-config
-          key: REDIS_HOST
-  livenessProbe:
-    httpGet:
-      path: /health
-      port: 5000
-    initialDelaySeconds: 30
-  initContainers:
-    - name: wait-for-mysql
-      image: busybox:1.28
-      command: ['sh', '-c', "until nc -zv mysql-service 3306; do echo waiting for mysql; sleep 5; done; sleep 10;"]
-  persistence:
-    enabled: true
-    storageClass: "ebs-sc"
-    size: 1Gi
-    mountPath: /data
-  config:
-    enabled: true
-    data:
-      MYSQL_HOST: "mysql-service"
-      MYSQL_DB: "enterprise_db"
-      REDIS_HOST: "redis"
-  secret:
-    enabled: true
-    stringData:
-      SECRET_KEY: nishant-devops-class-login-key
-  service:
-    type: ClusterIP
-    port: 80
-    targetPort: 5000
+fullnameOverride: "login-service"
+replicaCount: 1
+image:
+  repository: minjteck/login-service
+  tag: "v9"
+ports:
+  - containerPort: 5000
+env:
+  - name: SECRET_KEY
+    valueFrom:
+      secretKeyRef:
+        name: login-service-secret
+        key: SECRET_KEY
+  - name: MYSQL_HOST
+    valueFrom:
+      configMapKeyRef:
+        name: login-service-config
+        key: MYSQL_HOST
+  - name: MYSQL_DB
+    valueFrom:
+      configMapKeyRef:
+        name: login-service-config
+        key: MYSQL_DB
+  - name: MYSQL_USER
+    value: admin
+  - name: MYSQL_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: mysql-service-secret
+        key: MYSQL_PASSWORD
+  - name: REDIS_HOST
+    valueFrom:
+      configMapKeyRef:
+        name: login-service-config
+        key: REDIS_HOST
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 5000
+  initialDelaySeconds: 30
+initContainers:
+  - name: wait-for-mysql
+    image: busybox:1.28
+    command: ['sh', '-c', "until nc -zv mysql-service 3306; do echo waiting for mysql; sleep 5; done; sleep 10;"]
+persistence:
+  enabled: true
+  storageClass: "ebs-sc"
+  size: 1Gi
+  mountPath: /data
+config:
+  enabled: true
+  data:
+    MYSQL_HOST: "mysql-service"
+    MYSQL_DB: "enterprise_db"
+    REDIS_HOST: "redis"
+secret:
+  enabled: true
+  stringData:
+    SECRET_KEY: nishant-devops-class-login-key
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 5000

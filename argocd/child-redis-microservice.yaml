@@ -8,7 +8,10 @@ spec:
   source:
     repoURL: https://github.com/minj1992/05-argocd-helm.git
     targetRevision: master
-    path: argocd/manifests/redis
+    path: charts/enterprise-service
+    helm:
+      valueFiles:
+        - ../../argocd/manifests/redis/values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: enterprise-lab

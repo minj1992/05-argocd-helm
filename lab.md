@@ -28,28 +28,30 @@ This lab transitions from static YAML manifests to a **Centralized Helm Chart** 
 ```
 
 ## 🔹 2. Centralized Helm Architecture
-By using a centralized chart, we reduce boilerplate code. Instead of managing 10 separate Deployment YAMLs, we manage one template and 10 small `values.yaml` files.
+In this improved design, we point all ArgoCD applications directly to the **Centralized Chart**, passing a specific `values.yaml` file for each microservice. This ensures naming consistency and avoids complex Helm subchart dependencies.
 
 ```text
 +-----------------------+          +-----------------------+
-|  Centralized Chart    | <------- |   Microservice App    |
-| (enterprise-service)  |          | (login, audit, etc.)  |
+|  Centralized Chart    | <------- |  ArgoCD Application   |
+| (enterprise-service)  |          | (points to values)    |
 +-----------+-----------+          +-----------+-----------+
             |                                  |
             v                                  v
-    [ Shared Templates ]               [ Service Values ]
-    (Deploy, SVC, PVC)                 (Image, Env, Port)
+    [ Shared Templates ]               [ argocd/manifests/ ]
+    (Deploy, SVC, PVC)                 (Specific values.yaml)
 ```
 
-## 🔹 3. Helm dependency Management
-Each microservice chart in `argocd/manifests/` defines the centralized chart as a local dependency. ArgoCD automatically runs `helm dependency build` before applying the resources.
+## 🔹 3. ArgoCD Configuration
+Each microservice is defined as an ArgoCD `Application` that references the base chart and overrides values:
 
-**Example `Chart.yaml` for a service:**
+**Example Application Source:**
 ```yaml
-dependencies:
-  - name: enterprise-service
-    version: 0.1.0
-    repository: "file://../../../charts/enterprise-service"
+spec:
+  source:
+    path: charts/enterprise-service
+    helm:
+      valueFiles:
+        - ../../argocd/manifests/login/values.yaml
 ```
 
 ```text

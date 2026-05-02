@@ -1,27 +1,26 @@
-enterprise-service:
-  fullnameOverride: "audit-service"
-  replicaCount: 1
-  image:
-    repository: minjteck/audit-service
-    tag: "v9"
-  ports:
-    - containerPort: 8000
-  env:
-    - name: RABBITMQ_HOST
-      value: rabbitmq
-    - name: REDIS_HOST
-      value: redis
-  initContainers:
-    - name: wait-for-rabbitmq
-      image: busybox:1.28
-      command: ['sh', '-c', "until nc -zv rabbitmq 5672; do echo waiting for rabbitmq; sleep 5; done; sleep 10;"]
-  livenessProbe:
-    httpGet:
-      path: /health
-      port: 8000
-    initialDelaySeconds: 15
-    periodSeconds: 10
-  service:
-    type: ClusterIP
+fullnameOverride: "audit-service"
+replicaCount: 1
+image:
+  repository: minjteck/audit-service
+  tag: "v9"
+ports:
+  - containerPort: 8000
+env:
+  - name: RABBITMQ_HOST
+    value: rabbitmq
+  - name: REDIS_HOST
+    value: redis
+initContainers:
+  - name: wait-for-rabbitmq
+    image: busybox:1.28
+    command: ['sh', '-c', "until nc -zv rabbitmq 5672; do echo waiting for rabbitmq; sleep 5; done; sleep 10;"]
+livenessProbe:
+  httpGet:
+    path: /health
     port: 8000
-    targetPort: 8000
+  initialDelaySeconds: 15
+  periodSeconds: 10
+service:
+  type: ClusterIP
+  port: 8000
+  targetPort: 8000

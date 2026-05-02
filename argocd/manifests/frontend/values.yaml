@@ -1,66 +1,65 @@
-enterprise-service:
-  fullnameOverride: "frontend-service"
-  replicaCount: 2
-  image:
-    repository: minjteck/frontend-service
-    tag: "v9"
-  ports:
-    - containerPort: 8080
-  service:
-    type: NodePort
-    port: 80
-    targetPort: 8080
-    nodePort: 30009
-  initContainers:
-    - name: wait-for-mysql
-      image: busybox:1.28
-      command: ['sh', '-c', "until nc -zv mysql-service 3306; do echo waiting for mysql; sleep 5; done; sleep 10;"]
-  envFrom:
-    - configMapRef:
-        name: frontend-service-config
-    - secretRef:
-        name: frontend-service-secret
-    - secretRef:
-        name: mysql-service-secret
-  livenessProbe:
-    httpGet:
-      path: /health
-      port: 8080
-    initialDelaySeconds: 30
-  persistence:
-    enabled: true
-    storageClass: "ebs-sc"
-    size: 1Gi
-    mountPath: /data
-  config:
-    enabled: true
-    data:
-      LOGIN_URL: "http://login-service/login"
-      REGISTER_URL: "http://register-service/register"
-      PROFILE_URL: "http://profile-service/profile"
-      FORGOT_PASSWORD_URL: "http://forgot-password-service/reset-password"
-      LOGOUT_URL: "http://logout-service/logout"
-  secret:
-    enabled: true
-    stringData:
-      SECRET_KEY: nishant-devops-class-frontend-key
-  serviceAccount:
-    create: true
-    name: "frontend-sa"
-  rbac:
-    enabled: true
-    clusterRole:
-      rules:
-        - apiGroups: [""]
-          resources: ["pods", "nodes", "namespaces", "services"]
-          verbs: ["get", "list", "watch"]
-  extraManifests:
-    - apiVersion: storage.k8s.io/v1
-      kind: StorageClass
-      metadata:
-        name: ebs-sc
-      provisioner: ebs.csi.aws.com
-      parameters:
-        type: gp3
-      reclaimPolicy: Retain
-      volumeBindingMode: WaitForFirstConsumer
+fullnameOverride: "frontend-service"
+replicaCount: 2
+image:
+  repository: minjteck/frontend-service
+  tag: "v9"
+ports:
+  - containerPort: 8080
+service:
+  type: NodePort
+  port: 80
+  targetPort: 8080
+  nodePort: 30009
+initContainers:
+  - name: wait-for-mysql
+    image: busybox:1.28
+    command: ['sh', '-c', "until nc -zv mysql-service 3306; do echo waiting for mysql; sleep 5; done; sleep 10;"]
+envFrom:
+  - configMapRef:
+      name: frontend-service-config
+  - secretRef:
+      name: frontend-service-secret
+  - secretRef:
+      name: mysql-service-secret
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8080
+  initialDelaySeconds: 30
+persistence:
+  enabled: true
+  storageClass: "ebs-sc"
+  size: 1Gi
+  mountPath: /data
+config:
+  enabled: true
+  data:
+    LOGIN_URL: "http://login-service/login"
+    REGISTER_URL: "http://register-service/register"
+    PROFILE_URL: "http://profile-service/profile"
+    FORGOT_PASSWORD_URL: "http://forgot-password-service/reset-password"
+    LOGOUT_URL: "http://logout-service/logout"
+secret:
+  enabled: true
+  stringData:
+    SECRET_KEY: nishant-devops-class-frontend-key
+serviceAccount:
+  create: true
+  name: "frontend-sa"
+rbac:
+  enabled: true
+  clusterRole:
+    rules:
+      - apiGroups: [""]
+        resources: ["pods", "nodes", "namespaces", "services"]
+        verbs: ["get", "list", "watch"]
+extraManifests:
+  - apiVersion: storage.k8s.io/v1
+    kind: StorageClass
+    metadata:
+      name: ebs-sc
+    provisioner: ebs.csi.aws.com
+    parameters:
+      type: gp3
+    reclaimPolicy: Retain
+    volumeBindingMode: WaitForFirstConsumer
