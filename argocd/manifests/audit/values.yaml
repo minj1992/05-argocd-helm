@@ -11,6 +11,10 @@ enterprise-service:
       value: rabbitmq
     - name: REDIS_HOST
       value: redis
+  initContainers:
+    - name: wait-for-rabbitmq
+      image: busybox:1.28
+      command: ['sh', '-c', "until nc -zv rabbitmq 5672; do echo waiting for rabbitmq; sleep 2; done;"]
   livenessProbe:
     httpGet:
       path: /health

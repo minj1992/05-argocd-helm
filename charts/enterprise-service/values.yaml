@@ -37,6 +37,8 @@ livenessProbe: {}
 
 resources: {}
 
+initContainers: []
+
 volumes: []
 volumeMounts: []
 

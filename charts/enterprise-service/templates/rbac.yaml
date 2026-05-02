@@ -6,9 +6,9 @@ metadata:
   namespace: {{ .Values.namespace | default .Release.Namespace }}
   labels:
     {{- include "enterprise-service.labels" . | nindent 4 }}
+---
 {{- end }}
 {{- if .Values.rbac.enabled -}}
----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:

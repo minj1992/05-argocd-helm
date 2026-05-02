@@ -178,15 +178,14 @@ Once the root app is synced, you should see 10 child applications in the ArgoCD 
 
 ## 🔹 7. Troubleshooting Common Issues
 
-### ❌ Error: provided port is already allocated (30007)
-This means another service in the cluster is already using port 30007. 
-1.  **Resolution**: We have updated the `frontend-service` to use **NodePort 30008** to avoid conflicts with previous labs.
-2.  **Access URL**: Your new access URL will be `http://<NodeIP>:30008`.
+### ❌ Error: provided port is already allocated (30007/30008)
+This means another service in the cluster is already using the port. 
+1.  **Resolution**: We have updated the `frontend-service` to use **NodePort 30009** to avoid conflicts.
+2.  **Access URL**: Your new access URL will be `http://<NodeIP>:30009`.
 
 ### ❌ Pod in CrashLoopBackOff (DatabaseError: Unknown host / Connection Refused)
-1.  **Check Service Names**: We removed the `-svc` suffix from the centralized chart. The service name now exactly matches the `fullnameOverride`.
-2.  **DB Connection**: Ensure `MYSQL_HOST` is set to `mysql-service` (not `mysql-service-svc`).
-3.  **Readiness**: MySQL takes time to initialize. We have added a **Readiness Probe** to MySQL to ensure other services don't connect before it's ready. If you see `Connection Refused (111)`, wait 30-60 seconds for the DB to finish initializing.
+1.  **Check Service Names**: Service names now exactly match the `fullnameOverride` (e.g., `mysql-service`).
+2.  **Wait for DB**: MySQL takes time to initialize. We have added **initContainers** to all dependent microservices. They will now wait for `mysql-service:3306` to be ready before starting. You will see pods in `Init:0/1` status until MySQL is up.
 
 ---
 
@@ -196,7 +195,7 @@ Each microservice is bundled with specific Kubernetes objects that enable enterp
 | Manifest | Purpose | Application Usage |
 |----------|---------|-------------------|
 | **Deployment** | Pod Management | Defines the Python container, environment variables (`MYSQL_HOST`), and **Liveness Probes** (`/health`). |
-| **Service** | Load Balancing | Provides internal DNS names like `login-service` which the Frontend uses for API calls. **Frontend NodePort is 30008.** |
+| **Service** | Load Balancing | Provides internal DNS names like `login-service` which the Frontend uses for API calls. **Frontend NodePort is 30009.** |
 | **Secret** | Security | Holds sensitive DB passwords and Flask `SECRET_KEY`, injected as environment variables. |
 | **ConfigMap** | Configuration | Stores non-sensitive data like DB names or RabbitMQ URLs. |
 | **PVC / SC** | Persistence | Ensures MySQL and Redis data survives pod restarts. Used for the `/var/lib/mysql` mount point. |
