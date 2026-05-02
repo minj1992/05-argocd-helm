@@ -1,5 +1,5 @@
 enterprise-service:
-  nameOverride: "register-service"
+  fullnameOverride: "register-service"
   replicaCount: 1
   image:
     repository: minjteck/register-service
@@ -8,7 +8,7 @@ enterprise-service:
     - containerPort: 5000
   env:
     - name: MYSQL_HOST
-      value: mysql-svc
+      value: mysql-service
     - name: MYSQL_DB
       value: enterprise_db
     - name: MYSQL_USER
@@ -16,7 +16,7 @@ enterprise-service:
     - name: MYSQL_PASSWORD
       value: password123
     - name: RABBITMQ_HOST
-      value: rabbitmq-svc
+      value: rabbitmq
   livenessProbe:
     httpGet:
       path: /health

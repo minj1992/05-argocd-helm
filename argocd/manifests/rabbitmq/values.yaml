@@ -1,5 +1,5 @@
 enterprise-service:
-  nameOverride: "rabbitmq"
+  fullnameOverride: "rabbitmq"
   replicaCount: 1
   image:
     repository: rabbitmq

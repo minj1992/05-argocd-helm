@@ -1,5 +1,5 @@
 enterprise-service:
-  nameOverride: "redis"
+  fullnameOverride: "redis"
   replicaCount: 1
   image:
     repository: redis

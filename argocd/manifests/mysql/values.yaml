@@ -1,5 +1,5 @@
 enterprise-service:
-  nameOverride: "mysql"
+  fullnameOverride: "mysql-service"
   replicaCount: 1
   image:
     repository: mysql

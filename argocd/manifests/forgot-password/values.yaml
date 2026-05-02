@@ -1,5 +1,5 @@
 enterprise-service:
-  nameOverride: "forgot-password-service"
+  fullnameOverride: "forgot-password-service"
   replicaCount: 1
   image:
     repository: minjteck/forgot-password-service
@@ -8,7 +8,7 @@ enterprise-service:
     - containerPort: 5000
   env:
     - name: MYSQL_HOST
-      value: mysql-svc
+      value: mysql-service
     - name: MYSQL_DB
       value: enterprise_db
     - name: MYSQL_USER

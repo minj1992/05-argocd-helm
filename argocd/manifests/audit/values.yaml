@@ -1,5 +1,5 @@
 enterprise-service:
-  nameOverride: "audit-service"
+  fullnameOverride: "audit-service"
   replicaCount: 1
   image:
     repository: minjteck/audit-service
@@ -8,9 +8,9 @@ enterprise-service:
     - containerPort: 8000
   env:
     - name: RABBITMQ_HOST
-      value: rabbitmq-svc
+      value: rabbitmq
     - name: REDIS_HOST
-      value: redis-svc
+      value: redis
   livenessProbe:
     httpGet:
       path: /health

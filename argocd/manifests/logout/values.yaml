@@ -1,5 +1,5 @@
 enterprise-service:
-  nameOverride: "logout-service"
+  fullnameOverride: "logout-service"
   replicaCount: 1
   image:
     repository: minjteck/logout-service
@@ -8,7 +8,7 @@ enterprise-service:
     - containerPort: 5000
   env:
     - name: REDIS_HOST
-      value: redis-svc
+      value: redis
   livenessProbe:
     httpGet:
       path: /health

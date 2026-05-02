@@ -1,5 +1,5 @@
 enterprise-service:
-  nameOverride: "login-service"
+  fullnameOverride: "login-service"
   replicaCount: 1
   image:
     repository: minjteck/login-service
@@ -47,9 +47,9 @@ enterprise-service:
   config:
     enabled: true
     data:
-      MYSQL_HOST: "mysql-svc"
+      MYSQL_HOST: "mysql-service"
       MYSQL_DB: "enterprise_db"
-      REDIS_HOST: "redis-svc"
+      REDIS_HOST: "redis"
   secret:
     enabled: true
     stringData:
