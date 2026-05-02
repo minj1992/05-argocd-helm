@@ -14,7 +14,7 @@ enterprise-service:
   initContainers:
     - name: wait-for-rabbitmq
       image: busybox:1.28
-      command: ['sh', '-c', "until nc -zv rabbitmq 5672; do echo waiting for rabbitmq; sleep 2; done;"]
+      command: ['sh', '-c', "until nc -zv rabbitmq 5672; do echo waiting for rabbitmq; sleep 5; done; sleep 10;"]
   livenessProbe:
     httpGet:
       path: /health
