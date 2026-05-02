@@ -16,8 +16,8 @@ def health():
 def start_health_server():
     app.run(host='0.0.0.0', port=8000)
 
-RABBITMQ_HOST = os.getenv('RABBITMQ_HOST', 'rabbitmq-svc.enterprise-lab.svc.cluster.local')
-REDIS_HOST = os.getenv('REDIS_HOST', 'redis-svc.enterprise-lab.svc.cluster.local')
+RABBITMQ_HOST = os.getenv('RABBITMQ_HOST', 'rabbitmq-svc')
+REDIS_HOST = os.getenv('REDIS_HOST', 'redis-svc')
 
 # Initialize Redis for Event Storage
 cache = redis.Redis(host=REDIS_HOST, port=6379, decode_responses=True)
